@@ -10,6 +10,7 @@ var users = require('./routes/users');
 var settings = require('./settings');
 var flash = require('connect-flash');
 
+
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 
@@ -27,6 +28,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(flash());
+
 
 app.use(session({
   secret: settings.cookieSecret,

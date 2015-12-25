@@ -16,6 +16,8 @@
     "mongodb": "2.0.52",
     "morgan": "~1.6.1",
     "serve-favicon": "~2.3.0",
-    "connect-flash": "0.1.1"
+    "connect-flash": "0.1.1",
+    "markdown": "0.5.0",
+    "multer": "1.1.0"
   }
 }

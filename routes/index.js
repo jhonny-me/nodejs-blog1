@@ -3,6 +3,8 @@ var router = express.Router();
 var crypto = require('crypto'),
     User   = require('../models/user.js'),
     Post   = require('../models/post.js');
+var multer = require('multer'),
+    upload = multer({ dest: './public/images/' });
 
 /* GET home page. */
 module.exports = function(app) {
@@ -153,6 +155,24 @@ module.exports = function(app) {
       req.flash('success', '退出成功');
       res.redirect('/');
   });
+
+    app.get('/upload', checkLogin);
+    app.get('/upload', function (req, res) {
+        res.render('upload', {
+            title: '文件上传',
+            user: req.session.user,
+            success: req.flash('success').toString(),
+            error: req.flash('error').toString()
+        });
+    });
+
+    app.post('/upload', checkLogin);
+    app.post('/upload', upload.array('photos', 5), function (req, res) {
+        console.log('funny this');
+        console.log(req.files);
+        req.flash('success', '文件上传成功!');
+        res.redirect('/upload');
+    });
 };
 
 function checkLogin(req, res, next){
