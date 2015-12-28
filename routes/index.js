@@ -3,8 +3,8 @@ var router = express.Router();
 var crypto = require('crypto'),
     User   = require('../models/user.js'),
     Post   = require('../models/post.js');
-var multer = require('multer'),
-    upload = multer({ dest: './public/images/' });
+//var multer = require('multer'),
+//    upload = multer({ dest: './public/images/' });
 
 /* GET home page. */
 module.exports = function(app) {
@@ -167,9 +167,7 @@ module.exports = function(app) {
     });
 
     app.post('/upload', checkLogin);
-    app.post('/upload', upload.array('photos', 5), function (req, res) {
-        console.log('funny this');
-        console.log(req.files);
+    app.post('/upload', function (req, res) {
         req.flash('success', '文件上传成功!');
         res.redirect('/upload');
     });

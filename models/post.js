@@ -64,7 +64,7 @@ Post.prototype.save = function(callback){
         });
     });
 };
-
+// 根据用户名查所有该用户的文章
 Post.get = function (name, callback){
     // open db
   mongodb.open(function(err, db){
