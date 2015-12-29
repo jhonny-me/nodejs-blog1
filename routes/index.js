@@ -154,7 +154,7 @@ module.exports = function(app) {
       var currentUser = req.session.user;
       var tags = [req.body.tag1, req.body.tag2, req.body.tag3];
       console.log('posts tags == '+tags);
-      post = new Post(currentUser.name, req.body.title, tags, req.body.post);
+      post = new Post(currentUser.name, currentUser.head, req.body.title, tags, req.body.post);
       post.save(function(err){
           if(err){
               req.flash('error', err);
@@ -268,8 +268,12 @@ module.exports = function(app) {
         var date = new Date(),
             time = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " +
                 date.getHours() + ":" + (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes());
+        var md5 = crypto.createHash('md5'),
+            email_MD5 = md5.update(req.body.email.toLowerCase()).digest('hex'),
+            head = "http://www.gravatar.com/avatar/" + email_MD5 + "?s=48";
         var comment = {
             name: req.body.name,
+            head: head,
             email: req.body.email,
             website: req.body.website,
             time: time,
@@ -387,11 +391,12 @@ module.exports = function(app) {
             });
         });
     });
-};
 
-app.use(function (req, res) {
-    res.render("404");
-});
+    app.use(function (req, res) {
+        res.render("404");
+    });
+
+};
 
 function checkLogin(req, res, next){
     if (!req.session.user){
