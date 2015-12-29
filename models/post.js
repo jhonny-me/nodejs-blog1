@@ -26,7 +26,8 @@ Post.prototype.save = function(callback){
         time: time,
         name: this.name,
         post: this.post,
-        title: this.title
+        title: this.title,
+        comments: []
     };
 
     //open db
@@ -120,10 +121,16 @@ Post.getOne = function (name, day, title, callback){
                 "time.day": day
             }, function (err, result) {
                 mongodb.close();
-                if (err){
+                if (err) {
                     return callback(err);
                 }
-                result.post = markdown.toHTML(result.post);
+
+                if (result) {
+                  result.post = markdown.toHTML(result.post);
+                  result.comments.forEach(function (comment) {
+                    comment.content = markdown.toHTML(comment.content);
+                  });
+                }
                 callback(null, result);
             });
         });
