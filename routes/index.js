@@ -25,13 +25,11 @@ module.exports = function(app) {
       if (page ==0){
           page =1;
       }
-      console.log('page == '+ page+'pageSize == '+pageSize);
       //查询并返回第 page 页的 10 篇文章
       Post.getAllBySize(name, page, pageSize, function(err, posts, total){
           if(err){
               posts = [];
           }
-          console.log('function: '+posts);
           res.render('index', {
               title: '主页',
               user: req.session.user,
@@ -188,6 +186,23 @@ module.exports = function(app) {
     app.post('/upload', function (req, res) {
         req.flash('success', '文件上传成功!');
         res.redirect('/upload');
+    });
+
+
+    app.get('/search', function (req, res) {
+        Post.search(req.query.keyword, function (err, posts) {
+            if (err) {
+                req.flash('error', err);
+                return res.redirect('/');
+            }
+            res.render('search', {
+                title: "SEARCH:" + req.query.keyword,
+                posts: posts,
+                user: req.session.user,
+                success: req.flash('success').toString(),
+                error: req.flash('error').toString()
+            });
+        });
     });
 
     app.get('/u/:name', function (req, res) {

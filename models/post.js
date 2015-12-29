@@ -84,11 +84,9 @@ Post.getAllBySize = function (name, page, pageSize, callback){
           if (name) {
               query.name = name;
           }
-          console.log('db: page = '+page+' pageSize= '+pageSize);
           //使用 count 返回特定查询的文档数 total
           collection.count(query, function (err, total) {
               if (err){
-                  console.log('db error: '+err);
                   return callback(err);
               }
               //根据 query 对象查询，并跳过前 (page-1)*10 个结果，返回之后的 10 个结果
@@ -97,10 +95,8 @@ Post.getAllBySize = function (name, page, pageSize, callback){
               }).toArray(function (err, docs) {
                   db.close();
                   if (err){
-                      console.log('find err '+err);
                       return callback(err);
                   }
-
                   docs.forEach(function (doc) {
                       doc.post = markdown.toHTML(doc.post);
                   });
@@ -126,7 +122,6 @@ Post.getOne = function (name, day, title, callback){
                 mongodb.close();
                 return  callback(err);
             }
-            console.log('name:'+ name+ 'title:'+ title+ 'time'+ day);
             collection.findOne({
                 "name": name,
                 "title": title,
@@ -333,6 +328,41 @@ Post.getTag = function(tag, callback) {
                     return callback(err);
                 }
                 callback(null, docs);
+            });
+        });
+    });
+};
+
+// search
+Post.search = function (keyword, callback) {
+    mongodb.open(function (err, db) {
+
+        if (err){
+            return callback(err);
+        }
+
+        db.collection('posts', function (err, collection) {
+            if (err){
+                mongodb.close();
+                return callback(err);
+            }
+
+            var pattern = new RegExp(keyword, "i");
+            collection.find({
+                title: pattern
+            },{
+                name: 1,
+                time: 1,
+                title: 1
+            }).sort({
+                time: -1
+            }).toArray(function (err, docs) {
+                mongodb.close();
+                if (err){
+                    return callback(err);
+                }
+
+                return callback(null, docs);
             });
         });
     });
