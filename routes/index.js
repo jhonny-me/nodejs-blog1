@@ -7,6 +7,9 @@ var crypto = require('crypto'),
 //var multer = require('multer'),
 //    upload = multer({ dest: './public/images/' });
 
+// get pageSize
+var pageSize = 2;
+
 /* GET home page. */
 module.exports = function(app) {
   app.get('/', function (req, res) {
@@ -16,14 +19,26 @@ module.exports = function(app) {
       }else {
           name = req.session.user.name;
       }
-      Post.getAll(name, function(err, posts){
+
+      //判断是否是第一页，并把请求的页数转换成 number 类型
+      var page = parseInt(req.query.p) || 1;
+      if (page ==0){
+          page =1;
+      }
+      console.log('page == '+ page+'pageSize == '+pageSize);
+      //查询并返回第 page 页的 10 篇文章
+      Post.getAllBySize(name, page, pageSize, function(err, posts, total){
           if(err){
               posts = [];
           }
+          console.log('function: '+posts);
           res.render('index', {
               title: '主页',
               user: req.session.user,
               posts: posts,
+              page: page,
+              isFirstPage: page ==1,
+              isLastPage: ((page -1)*pageSize +posts.length) == total,
               success: req.flash('success').toString(),
               error: req.flash('error').toString()
           });
@@ -174,6 +189,10 @@ module.exports = function(app) {
     });
 
     app.get('/u/:name', function (req, res) {
+        var page = parseInt(req.query.q) || 1;
+        if (page ==0){
+            page =1;
+        }
         User.get(req.params.name, function (err, user) {
             if(err){
                 req.flash('error', err);
@@ -184,14 +203,17 @@ module.exports = function(app) {
                 return res.redirect('/');
             }
 
-            Post.getAll(user.name, function (err, result) {
+            Post.getAllBySize(user.name, page, pageSize, function (err, result, total) {
                 if(err){
-                    req.flash('error', "文章读取失败");
+                    req.flash('error', err);
                     return res.redirect('/');
                 }
                 res.render('user', {
                     title: user.name,
                     posts: result,
+                    page: page,
+                    isFirstPage: page ==1,
+                    isLastPage: ((page -1)*pageSize +result.length) == total,
                     user : req.session.user,
                     success : req.flash('success').toString(),
                     error : req.flash('error').toString()

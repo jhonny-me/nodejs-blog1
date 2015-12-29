@@ -65,7 +65,7 @@ Post.prototype.save = function(callback){
     });
 };
 // 根据用户名查所有该用户的文章
-Post.getAll = function (name, callback){
+Post.getAllBySize = function (name, page, pageSize, callback){
     // open db
   mongodb.open(function(err, db){
       if(err){
@@ -81,19 +81,28 @@ Post.getAll = function (name, callback){
           if (name) {
               query.name = name;
           }
-          //根据 query 对象查询文章
-          collection.find(query).sort({
-              time: -1
-          }).toArray(function (err, docs) {
-              mongodb.close();
-              if (err) {
-                  return callback(err);//失败！返回 err
+          console.log('db: page = '+page+' pageSize= '+pageSize);
+          //使用 count 返回特定查询的文档数 total
+          collection.count(query, function (err, total) {
+              if (err){
+                  console.log('db error: '+err);
+                  return callback(err);
               }
-              //解析 markdown 为 html
-              docs.forEach(function (doc) {
-                  doc.post = markdown.toHTML(doc.post);
+              //根据 query 对象查询，并跳过前 (page-1)*10 个结果，返回之后的 10 个结果
+              collection.find(query).skip((page -1)*pageSize).limit(pageSize).sort({
+                  time: -1
+              }).toArray(function (err, docs) {
+                  db.close();
+                  if (err){
+                      console.log('find err '+err);
+                      return callback(err);
+                  }
+
+                  docs.forEach(function (doc) {
+                      doc.post = markdown.toHTML(doc.post);
+                  });
+                  return callback(null, docs, total);
               });
-              callback(null, docs);//成功！以数组形式返回查询的结果
           });
       });
   });
