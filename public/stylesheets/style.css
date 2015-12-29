@@ -18,3 +18,5 @@ article a:hover{color:#333333;text-decoration:underline;}
 .archive{list-style:none;line-height:28px;}
 .archive h3{margin:0.5em 0;}
 .archive time{float:left;font-size:14px;color:#999999;margin-right:1.2em;}
+.tag{background-color:#ff0000;border-radius:3px;font-size:14px;color:#ffffff;display:inline-block;padding:0 5px;margin-bottom:8px;}
+.tag:hover{text-decoration:none;background-color:#ffffff;color:#000000;-webkit-transition:color .2s linear;}
