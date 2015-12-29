@@ -29,7 +29,8 @@ Post.prototype.save = function(callback){
         post: this.post,
         tags: this.tags,
         title: this.title,
-        comments: []
+        comments: [],
+        pv: 0
     };
 
     //open db
@@ -131,9 +132,23 @@ Post.getOne = function (name, day, title, callback){
                 "title": title,
                 "time.day": day
             }, function (err, result) {
-                mongodb.close();
                 if (err) {
+                    mongodb.close();
                     return callback(err);
+                }
+                if (result){
+                    collection.update({
+                        name: name,
+                        "time.day": day,
+                        title: title
+                    },{
+                        $inc: {pv: 1}
+                    }, function (err) {
+                        mongodb.close();
+                        if (err){
+                            return callback(err);
+                        }
+                    });
                 }
 
                 if (result) {
