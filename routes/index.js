@@ -310,6 +310,24 @@ module.exports = function(app) {
             res.redirect('/');
         });
     });
+
+    // archive
+    app.get('/archive', function (req, res) {
+        Post.archive(function (err, posts) {
+            if (err){
+                req.flash('error',error);
+                return res.redirect('/');
+            }
+
+            res.render('archive', {
+                title: '存档',
+                posts: posts,
+                user: req.session.user,
+                success: req.flash('success').toString(),
+                error: req.flash('error').toString()
+            });
+        });
+    });
 };
 
 function checkLogin(req, res, next){
