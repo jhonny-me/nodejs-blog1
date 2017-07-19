@@ -215,7 +215,7 @@ module.exports = function(app) {
     });
 
     app.get('/u/:name', function (req, res) {
-        var page = parseInt(req.query.q) || 1;
+        var page = parseInt(req.query.p) || 1;
         if (page ==0){
             page =1;
         }
