@@ -1,6 +1,6 @@
-var express = require('express');
-var router = express.Router();
-var crypto = require('crypto'),
+const express = require('express');
+const router = express.Router();
+const crypto = require('crypto'),
     User   = require('../models/user.js'),
     Post   = require('../models/post.js'),
     Comment = require('../models/comment.js');
@@ -13,7 +13,7 @@ var pageSize = 2;
 /* GET home page. */
 module.exports = function(app) {
   app.get('/', function (req, res) {
-      var name;
+      let name;
       if(!req.session.user){
           name = null;
       }else {
@@ -68,7 +68,7 @@ module.exports = function(app) {
     // generate password's MD5
     var md5 = crypto.createHash('md5'),
         password = md5.update(req.body.password).digest('hex');
-    var newUser = new User({
+    const newUser = new User({
       name: name,
       password: password,
       email: req.body.email
@@ -101,7 +101,7 @@ module.exports = function(app) {
   });
 
     app.get('/login', checkNotLogin);
-  app.get('/login', function (req, res) {
+  app.get('/login',  (req, res) => {
 
     res.render('login', {
         title: '登录',
@@ -112,12 +112,12 @@ module.exports = function(app) {
   });
 
     app.post('/login', checkNotLogin);
-  app.post('/login', function (req, res) {
-      // get md5 passord
+  app.post('/login',  (req, res) => {
+      // get md5 passordfunction
       var md5 = crypto.createHash('md5'),
           password = md5.update(req.body.password).digest('hex');
       // check if user exist
-      User.get(req.body.name, function(err, user) {
+      User.get(req.body.name, (err, user) => {
           if (err){
               req.flash('error', err);
               return res.redirect('/login');
@@ -140,7 +140,7 @@ module.exports = function(app) {
   });
 
     app.get('/post', checkLogin);
-  app.get('/post', function (req, res) {
+  app.get('/post',  (req, res) => {
       res.render('post', {
           title: '发表',
           user: req.session.user,
@@ -150,10 +150,10 @@ module.exports = function(app) {
   });
 
     app.post('/post', checkLogin);
-  app.post('/post', function (req, res) {
-      var currentUser = req.session.user;
-      var tags = [req.body.tag1, req.body.tag2, req.body.tag3];
-      console.log('posts tags == '+tags);
+  app.post('/post',  (req, res) => {
+      const currentUser = req.session.user;
+      const tags = [req.body.tag1, req.body.tag2, req.body.tag3];
+//       console.log('posts tags == '+tags);
       post = new Post(currentUser.name, currentUser.head, req.body.title, tags, req.body.post);
       post.save(function(err){
           if(err){
@@ -166,14 +166,14 @@ module.exports = function(app) {
   });
 
     app.get('/logout', checkLogin);
-  app.get('/logout', function (req, res) {
+  app.get('/logout',  (req, res) => {
       req.session.user = null;
       req.flash('success', '退出成功');
       res.redirect('/');
   });
 
     app.get('/upload', checkLogin);
-    app.get('/upload', function (req, res) {
+    app.get('/upload',  (req, res) => {
         res.render('upload', {
             title: '文件上传',
             user: req.session.user,
@@ -183,13 +183,13 @@ module.exports = function(app) {
     });
 
     app.post('/upload', checkLogin);
-    app.post('/upload', function (req, res) {
+    app.post('/upload',  (req, res) => {
         req.flash('success', '文件上传成功!');
         res.redirect('/upload');
     });
 
 
-    app.get('/search', function (req, res) {
+    app.get('/search',  (req, res) => {
         Post.search(req.query.keyword, function (err, posts) {
             if (err) {
                 req.flash('error', err);
@@ -205,7 +205,7 @@ module.exports = function(app) {
         });
     });
 
-    app.get('/links', function (req, res) {
+    app.get('/links',  (req, res) => {
         res.render('links', {
             title: '友情链接',
             user: req.session.user,
@@ -214,12 +214,12 @@ module.exports = function(app) {
         });
     });
 
-    app.get('/u/:name', function (req, res) {
-        var page = parseInt(req.query.p) || 1;
+    app.get('/u/:name',  (req, res) => {
+        let page = parseInt(req.query.p) || 1;
         if (page ==0){
             page =1;
         }
-        User.get(req.params.name, function (err, user) {
+        User.get(req.params.name,  (err, user) => {
             if(err){
                 req.flash('error', err);
                 return res.redirect('/');
@@ -229,7 +229,7 @@ module.exports = function(app) {
                 return res.redirect('/');
             }
 
-            Post.getAllBySize(user.name, page, pageSize, function (err, result, total) {
+            Post.getAllBySize(user.name, page, pageSize,  (err, result, total) => {
                 if(err){
                     req.flash('error', err);
                     return res.redirect('/');
@@ -248,8 +248,8 @@ module.exports = function(app) {
         });
     });
 
-    app.get('/u/:name/:day/:title', function (req, res) {
-        Post.getOne(req.params.name, req.params.day, req.params.title, function (err, post) {
+    app.get('/u/:name/:day/:title',  (req, res) => {
+        Post.getOne(req.params.name, req.params.day, req.params.title,  (err, post) => {
             if (err) {
                 req.flash('error', err);
                 return res.redirect('/');
@@ -264,14 +264,14 @@ module.exports = function(app) {
         });
     });
 
-    app.post('/u/:name/:day/:title', function (req, res) {
-        var date = new Date(),
+    app.post('/u/:name/:day/:title',  (req, res) => {
+        let date = new Date(),
             time = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " +
                 date.getHours() + ":" + (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes());
-        var md5 = crypto.createHash('md5'),
+        const md5 = crypto.createHash('md5'),
             email_MD5 = md5.update(req.body.email.toLowerCase()).digest('hex'),
             head = "http://www.gravatar.com/avatar/" + email_MD5 + "?s=48";
-        var comment = {
+        let comment = {
             name: req.body.name,
             head: head,
             email: req.body.email,
@@ -279,9 +279,9 @@ module.exports = function(app) {
             time: time,
             content: req.body.content
         };
-        var newComment = new Comment(req.params.name, req.params.day, req.params.title, comment);
+        let newComment = new Comment(req.params.name, req.params.day, req.params.title, comment);
         console.log('in post '+ req.body.content);
-        newComment.save(function (err) {
+        newComment.save( (err) => {
             if (err) {
                 req.flash('error', err);
                 return res.redirect('back');
@@ -293,9 +293,9 @@ module.exports = function(app) {
 
     // 编辑
     app.get('/edit/:name/:day/:title', checkLogin);
-    app.get('/edit/:name/:day/:title', function (req, res) {
+    app.get('/edit/:name/:day/:title',  (req, res) => {
         // 获取markdown格式的文档
-        Post.edit(req.params.name, req.params.day, req.params.title, function (err, post) {
+        Post.edit(req.params.name, req.params.day, req.params.title,  (err, post) => {
             if (err){
                 req.flash('error', err);
                 return res.redirect('back');
@@ -312,10 +312,10 @@ module.exports = function(app) {
     });
 
     app.post('/edit/:name/:day/:title', checkLogin);
-    app.post('/edit/:name/:day/:title', function (req, res) {
+    app.post('/edit/:name/:day/:title',  (req, res) => {
         // 保存user,不然可能会丢失
-        var currentUser = req.session.user;
-        Post.update(currentUser.name, req.params.day, req.params.title, req.body.post, function (err) {
+        const currentUser = req.session.user;
+        Post.update(currentUser.name, req.params.day, req.params.title, req.body.post,  (err) => {
             var url = encodeURI('/u/'+ currentUser.name+ '/'+ req.params.day+ '/'+ req.params.title);
             if (err){
                 req.flash('error', err);
@@ -329,8 +329,8 @@ module.exports = function(app) {
 
     // 删除
     app.get('/remove/:name/:day/:title', checkLogin);
-    app.get('/remove/:name/:day/:title', function (req, res) {
-        Post.remove(req.params.name, req.params.day, req.params.title, function (err) {
+    app.get('/remove/:name/:day/:title',  (req, res) => {
+        Post.remove(req.params.name, req.params.day, req.params.title,  (err) => {
             if (err){
                 req.flash('error', err);
                 return res.redirect('back');
@@ -342,8 +342,8 @@ module.exports = function(app) {
     });
 
     // archive
-    app.get('/archive', function (req, res) {
-        Post.archive(function (err, posts) {
+    app.get('/archive',  (req, res) => {
+        Post.archive( (err, posts) => {
             if (err){
                 req.flash('error',error);
                 return res.redirect('/');
@@ -360,8 +360,8 @@ module.exports = function(app) {
     });
 
     //tags
-    app.get('/tags', function (req, res) {
-        Post.getTags(function (err, posts) {
+    app.get('/tags',  (req, res) => {
+        Post.getTags( (err, posts) => {
             if (err) {
                 req.flash('error', err);
                 return res.redirect('/');
@@ -376,8 +376,8 @@ module.exports = function(app) {
         });
     });
 
-    app.get('/tags/:tag', function (req, res) {
-        Post.getTag(req.params.tag, function (err, posts) {
+    app.get('/tags/:tag',  (req, res) => {
+        Post.getTag(req.params.tag,  (err, posts) => {
             if (err) {
                 req.flash('error',err);
                 return res.redirect('/');
@@ -392,13 +392,13 @@ module.exports = function(app) {
         });
     });
 
-    app.use(function (req, res) {
+    app.use( (req, res) => {
         res.render("404");
     });
 
 };
 
-function checkLogin(req, res, next){
+ const checkLogin =(req, res, next) => {
     if (!req.session.user){
         req.flash('error', '未登录');
         res.redirect('/login');
@@ -406,7 +406,7 @@ function checkLogin(req, res, next){
     next();
 }
 
-function checkNotLogin(req, res, next){
+const checkNotLogin = (req, res, next) => {
     if(req.session.user){
         req.flash('error', '已登录');
         res.redirect('back');
