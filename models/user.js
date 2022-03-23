@@ -1,5 +1,5 @@
-var mongodb = require('./db');
-var crypto  = require('crypto');
+const mongodb = require('./db');
+const crypto  = require('crypto');
 
 function User(user) {
     this.name     = user.name;
@@ -12,23 +12,23 @@ module.exports = User;
 // store user info
 User.prototype.save = function(callback) {
 
-    var md5 = crypto.createHash('md5'),
+    const md5 = crypto.createHash('md5'),
         email_MD5 = md5.update(this.email.toLowerCase()).digest('hex'),
         head = "http://www.gravatar.com/avatar/" + email_MD5 + "?s=48";
     // save info document
-    var user = {
+    const user = {
         name: this.name,
         password: this.password,
         email: this.email,
         head: head
     };
     // opne datebase
-    mongodb.open(function (err, db) {
+    mongodb.open( (err, db) => {
         if (err) {
             return callback(err);
         }
         // read user collection
-        db.collection('users', function (err, collection) {
+        db.collection('users',  (err, collection) => {
 
             if (err){
 
@@ -50,14 +50,14 @@ User.prototype.save = function(callback) {
 };
 
 // read info by name
-User.get = function (name, callback) {
+User.get =  (name, callback) => {
     // open db
-    mongodb.open(function (err, db) {
+    mongodb.open( (err, db) => {
        if (err){
 
            return callback(err);
        }
-        db.collection('users', function (err, collection){
+        db.collection('users',  (err, collection) => {
             if (err){
                 db.close();
                 return callback(err);
@@ -65,7 +65,7 @@ User.get = function (name, callback) {
             // find document by name
             collection.findOne({
                 name: name
-            }, function (err, user){
+            },  (err, user) => {
                 mongodb.close();
                 if (err){
                     return callback(err);// fail, return err
